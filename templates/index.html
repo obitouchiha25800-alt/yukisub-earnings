@@ -64,6 +64,50 @@
             font-weight: 400;
         }
 
+        .month-nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 8px;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            opacity: 0.6;
+        }
+
+        .nav-btn:hover {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.1);
+        }
+
+        .nav-btn:active {
+            transform: scale(0.95);
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .month-display {
+            font-size: 16px;
+            color: #a0a0a0;
+            font-weight: 400;
+            min-width: 150px;
+            text-align: center;
+        }
+
         .stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -348,6 +392,21 @@
                 font-size: 14px;
             }
 
+            .month-nav-container {
+                gap: 10px;
+                margin-top: 6px;
+            }
+
+            .month-display {
+                font-size: 14px;
+                min-width: 120px;
+            }
+
+            .nav-icon {
+                width: 18px;
+                height: 18px;
+            }
+
             .stats {
                 gap: 12px;
                 margin-bottom: 15px;
@@ -447,7 +506,26 @@
                 </svg>
                 <h1>YukiSub Earnings</h1>
             </div>
-            <div class="month-year" id="monthYear">{{ month }} {{ year }}</div>
+            <div class="month-nav-container">
+                <!-- Previous Month Button -->
+                <a href="/?month={{ prev_month }}&year={{ prev_year }}" class="nav-btn" title="Previous Month">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15 18l-6-6 6-6" stroke="#a0a0a0" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </a>
+
+                <!-- Month Display -->
+                <div class="month-display" id="monthYear">{{ month }} {{ year }}</div>
+
+                <!-- Next Month Button -->
+                <a href="/?month={{ next_month }}&year={{ next_year }}" class="nav-btn" title="Next Month">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9 18l6-6-6-6" stroke="#a0a0a0" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                </a>
+            </div>
         </div>
 
         <!-- Stats Cards -->
@@ -537,6 +615,21 @@
     <script>
         let currentEntries = [];
 
+        // Get URL parameters
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                month: params.get('month'),
+                year: params.get('year')
+            };
+        }
+
+        // Get month name from URL or current
+        function getMonthName() {
+            const monthDisplay = document.getElementById('monthYear').textContent;
+            return monthDisplay; // Returns "Month Year" format
+        }
+
         // Show toast notification
         function showToast(message) {
             const toast = document.getElementById('toast');
@@ -550,7 +643,15 @@
         // Load earnings data
         async function loadEarnings() {
             try {
-                const response = await fetch('/api/earnings');
+                const params = getUrlParams();
+                let url = '/api/earnings';
+
+                // Add month and year parameters if they exist
+                if (params.month && params.year) {
+                    url += `?month=${params.month}&year=${params.year}`;
+                }
+
+                const response = await fetch(url);
                 const data = await response.json();
 
                 currentEntries = data.earnings;
@@ -561,9 +662,10 @@
 
                 // Update entries list
                 const entriesList = document.getElementById('entriesList');
+                const monthName = getMonthName();
 
                 if (data.earnings.length === 0) {
-                    entriesList.innerHTML = '<div class="empty-state">No entries yet for this month</div>';
+                    entriesList.innerHTML = `<div class="empty-state">No entries found for ${monthName}</div>`;
                 } else {
                     entriesList.innerHTML = data.earnings.map(entry => `
                         <div class="entry-item">
@@ -605,7 +707,9 @@
                     showToast('✅ Entry added successfully!');
                     document.getElementById('userName').value = '';
                     document.getElementById('amount').value = '49';
-                    loadEarnings();
+
+                    // Redirect to current month after adding entry
+                    window.location.href = '/';
                 } else {
                     showToast('❌ Failed to add entry');
                 }
