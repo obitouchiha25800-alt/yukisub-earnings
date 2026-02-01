@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YukiSub Earnings Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .header-title h1 {
+            font-size: 24px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-icon {
+            width: 28px;
+            height: 28px;
+            flex-shrink: 0;
+        }
+
+        .header .month-year {
+            font-size: 16px;
+            color: #a0a0a0;
+            font-weight: 400;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-card .label {
+            font-size: 13px;
+            color: #a0a0a0;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .stat-icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .stat-card .value {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .form-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #e0e0e0;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .entries-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .entries-section h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #e0e0e0;
+        }
+
+        .entry-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 18px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .entry-item:hover {
+            background: rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(2px);
+        }
+
+        .entry-date {
+            font-size: 13px;
+            color: #a0a0a0;
+            font-weight: 500;
+            font-family: 'Courier New', monospace;
+            white-space: nowrap;
+        }
+
+        .entry-name {
+            font-size: 15px;
+            color: #e0e0e0;
+            font-weight: 400;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+        }
+
+        .entry-amount {
+            font-size: 16px;
+            color: #38ef7d;
+            font-weight: 700;
+            white-space: nowrap;
+            text-align: right;
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            opacity: 0.6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .delete-btn:hover {
+            opacity: 1;
+            background: rgba(255, 59, 48, 0.15);
+            transform: scale(1.1);
+        }
+
+        .delete-btn:active {
+            transform: scale(0.95);
+        }
+
+        .delete-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #a0a0a0;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(56, 239, 125, 0.9);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Mobile-first responsive design */
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 0;
+            }
+
+            .header {
+                padding: 20px 15px;
+                margin-bottom: 15px;
+            }
+
+            .header-title h1 {
+                font-size: 18px;
+            }
+
+            .header-icon {
+                width: 24px;
+                height: 24px;
+            }
+
+            .header .month-year {
+                font-size: 14px;
+            }
+
+            .stats {
+                gap: 12px;
+                margin-bottom: 15px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-card .value {
+                font-size: 24px;
+            }
+
+            .stat-card .label {
+                font-size: 12px;
+            }
+
+            .form-section {
+                padding: 20px 15px;
+                margin-bottom: 15px;
+            }
+
+            .entries-section {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+
+            .entries-section h2 {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+
+            .entry-item {
+                padding: 12px 14px;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+
+            .entry-date {
+                font-size: 11px;
+            }
+
+            .entry-name {
+                font-size: 14px;
+            }
+
+            .entry-amount {
+                font-size: 14px;
+            }
+
+            .delete-icon {
+                width: 18px;
+                height: 18px;
+            }
+
+            .toast {
+                right: 15px;
+                left: 15px;
+                top: 15px;
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+        }
+
+        /* Extra small screens */
+        @media (max-width: 360px) {
+            .entry-date {
+                font-size: 10px;
+            }
+
+            .entry-name {
+                font-size: 13px;
+            }
+
+            .entry-amount {
+                font-size: 13px;
+            }
+
+            .delete-icon {
+                width: 16px;
+                height: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">
+                <!-- Bar Chart SVG Icon -->
+                <svg class="header-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="13" width="4" height="8" rx="1" fill="#667eea" />
+                    <rect x="10" y="8" width="4" height="13" rx="1" fill="#764ba2" />
+                    <rect x="17" y="3" width="4" height="18" rx="1" fill="#667eea" />
+                </svg>
+                <h1>YukiSub Earnings</h1>
+            </div>
+            <div class="month-year" id="monthYear">{{ month }} {{ year }}</div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="label">
+                    <!-- Users SVG Icon -->
+                    <svg class="stat-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="9" cy="7" r="4" fill="#a0a0a0" />
+                        <path d="M2 20c0-3.314 2.686-6 6-6h2c3.314 0 6 2.686 6 6v1H2v-1z" fill="#a0a0a0" />
+                        <circle cx="17" cy="7" r="3" fill="#a0a0a0" opacity="0.7" />
+                        <path
+                            d="M22 20c0-2.485-1.567-4.6-3.765-5.415A5.994 5.994 0 0117 14c.711 0 1.388.122 2.018.345C20.838 15.178 22 17.432 22 20v1h-4v-1z"
+                            fill="#a0a0a0" opacity="0.7" />
+                    </svg>
+                    Total Members
+                </div>
+                <div class="value" id="totalMembers">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">
+                    <!-- Money SVG Icon -->
+                    <svg class="stat-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="2" y="6" width="20" height="12" rx="2" fill="#a0a0a0" />
+                        <circle cx="12" cy="12" r="3" fill="#667eea" />
+                        <path d="M7 12a1 1 0 110-2 1 1 0 010 2zm10 0a1 1 0 110-2 1 1 0 010 2z" fill="#a0a0a0" />
+                    </svg>
+                    Total Revenue
+                </div>
+                <div class="value" id="totalRevenue">₹0</div>
+            </div>
+        </div>
+
+        <!-- Input Form -->
+        <div class="form-section">
+            <form id="entryForm">
+                <div class="form-group">
+                    <label for="userName">User Name</label>
+                    <input type="text" id="userName" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label for="amount">Amount</label>
+                    <input type="number" id="amount" value="49" step="0.01" required>
+                </div>
+                <button type="submit" class="btn">Add Entry</button>
+            </form>
+        </div>
+
+        <!-- Entries List -->
+        <div class="entries-section">
+            <h2>Recent Entries</h2>
+            <div id="entriesList">
+                <div class="empty-state">No entries yet for this month</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let currentEntries = [];
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Load earnings data
+        async function loadEarnings() {
+            try {
+                const response = await fetch('/api/earnings');
+                const data = await response.json();
+
+                currentEntries = data.earnings;
+
+                // Update stats
+                document.getElementById('totalMembers').textContent = data.total_members;
+                document.getElementById('totalRevenue').textContent = `₹${data.total_revenue}`;
+
+                // Update entries list
+                const entriesList = document.getElementById('entriesList');
+
+                if (data.earnings.length === 0) {
+                    entriesList.innerHTML = '<div class="empty-state">No entries yet for this month</div>';
+                } else {
+                    entriesList.innerHTML = data.earnings.map(entry => `
+                        <div class="entry-item">
+                            <div class="entry-date">${entry.date}</div>
+                            <div class="entry-name">${entry.user_name}</div>
+                            <div class="entry-amount">₹${entry.amount}</div>
+                            <button class="delete-btn" onclick="deleteEntry(${entry.id})" title="Delete entry">
+                                <svg class="delete-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke="#ff3b30" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M10 11v6M14 11v6" stroke="#ff3b30" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading earnings:', error);
+                showToast('❌ Error loading data');
+            }
+        }
+
+        // Add new entry
+        document.getElementById('entryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const userName = document.getElementById('userName').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value);
+
+            try {
+                const response = await fetch('/api/earnings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_name: userName, amount: amount })
+                });
+
+                if (response.ok) {
+                    showToast('✅ Entry added successfully!');
+                    document.getElementById('userName').value = '';
+                    document.getElementById('amount').value = '49';
+                    loadEarnings();
+                } else {
+                    showToast('❌ Failed to add entry');
+                }
+            } catch (error) {
+                console.error('Error adding entry:', error);
+                showToast('❌ Error adding entry');
+            }
+        });
+
+        // Delete entry
+        async function deleteEntry(id) {
+            if (!confirm('Are you sure you want to delete this entry?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/earnings/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showToast('✅ Entry deleted successfully!');
+                    loadEarnings();
+                } else {
+                    showToast('❌ Failed to delete entry');
+                }
+            } catch (error) {
+                console.error('Error deleting entry:', error);
+                showToast('❌ Error deleting entry');
+            }
+        }
+
+        // Load earnings on page load
+        loadEarnings();
+    </script>
+</body>
+
+</html>
