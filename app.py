@@ -34,19 +34,52 @@ def get_current_month_filter():
 
 @app.route('/')
 def index():
-    """Render the main dashboard"""
-    month_name, year = get_current_month_year()
-    return render_template('index.html', month=month_name, year=year)
+    """Render the main dashboard with month navigation"""
+    # Get month and year from query parameters, or default to current
+    now = datetime.now()
+    month = request.args.get('month', now.month, type=int)
+    year = request.args.get('year', now.year, type=int)
+    
+    # Get month name
+    month_name = calendar.month_name[month]
+    
+    # Calculate previous month and year
+    if month == 1:
+        prev_month = 12
+        prev_year = year - 1
+    else:
+        prev_month = month - 1
+        prev_year = year
+    
+    # Calculate next month and year
+    if month == 12:
+        next_month = 1
+        next_year = year + 1
+    else:
+        next_month = month + 1
+        next_year = year
+    
+    return render_template('index.html', 
+                         month=month_name, 
+                         year=year,
+                         current_month=month,
+                         prev_month=prev_month,
+                         prev_year=prev_year,
+                         next_month=next_month,
+                         next_year=next_year)
 
 @app.route('/api/earnings', methods=['GET'])
 def get_earnings():
-    """Get all earnings for the current month"""
-    current_month, current_year = get_current_month_filter()
+    """Get all earnings for the specified or current month"""
+    # Get month and year from query parameters, or default to current
+    now = datetime.now()
+    current_month = request.args.get('month', now.month, type=int)
+    current_year = request.args.get('year', now.year, type=int)
     
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
     
-    # Fetch entries from current month only
+    # Fetch entries from specified month only
     cursor.execute('''
         SELECT id, user_name, amount, created_at 
         FROM earnings 
